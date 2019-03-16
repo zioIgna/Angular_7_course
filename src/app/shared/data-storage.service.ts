@@ -1,29 +1,32 @@
 import { Injectable } from "@angular/core";
-import { Http, Response } from "@angular/http";
 import { RecipeService } from "../recipes/recipe.service";
 import { Recipe } from "../recipes/recipe.model";
 import { map } from 'rxjs/operators';
 import { AuthService } from "../auth/auth.service";
+import { HttpClient, HttpParams } from "@angular/common/http";
 
 @Injectable()
 export class DataStorageService {
     constructor(
-        private http: Http,
+        private httpClient: HttpClient,
         private recipeService: RecipeService,
         private authService: AuthService
     ) { }
 
     storeRecipes() {
         const token = this.authService.getToken();
-        return this.http.put('https://da-angular-ricettario-semplice.firebaseio.com/recipes.json?auth=' + token, this.recipeService.getRecipes());
+        return this.httpClient.put(
+            'https://da-angular-ricettario-semplice.firebaseio.com/recipes.json',
+            this.recipeService.getRecipes(),
+            { params: new HttpParams().set('auth', token) }
+        );
     }
 
     getRecipes() {
         const token = this.authService.getToken();
-        this.http.get('https://da-angular-ricettario-semplice.firebaseio.com/recipes.json?auth=' + token)
+        this.httpClient.get<Recipe[]>('https://da-angular-ricettario-semplice.firebaseio.com/recipes.json?auth=' + token)
             .pipe(map(
-                (response: Response) => {
-                    const recipes: Recipe[] = response.json();
+                (recipes) => {
                     for (let recipe of recipes) {
                         if (!recipe['ingredients']) {
                             console.log(recipe);

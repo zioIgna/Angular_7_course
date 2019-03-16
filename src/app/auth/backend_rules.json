@@ -1,0 +1,15 @@
+{
+    "comment": "regole per non autorizzare nessuno",
+    "rules": {
+        ".read": false,
+        ".write": false
+    }
+}
+
+{
+    "comment": "regole per autorizzare solo gli autenticati",
+    "rules": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+    }
+}
